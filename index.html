@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Club Whisky Order</title>
-  <meta name="description" content="Order the club whisky bottle.">
+  <title>Bothy Bottling #3 Order</title>
+  <meta name="description" content="Register interest in Bothy Bottling #3 and order extra Bothy bottles.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="card">
     <header>
-      <h1>Club Whisky</h1>
-      <p class="lead">Order your bottle of this year's club whisky. Fill in the form and we'll be in touch about payment and collection.</p>
+      <h1>Dom Bothignan <span class="subtitle">Inchdairnie 2019 Sherry Bomb <span class="nowrap">@ 65% ABV</span></span></h1>
+      <p class="lead">This is an expression of interest in the next Bothy Bottling #3 - the cask is very small and we may not have enough to go around. We expect standard size bottles to cost around £35 and larger format bottles may be available.</p>
     </header>
 
     <form id="order-form" data-sheet-orders novalidate>
@@ -22,17 +22,43 @@
       </div>
 
       <div class="field">
-        <label for="contact">Email or member number</label>
-        <input id="contact" name="contact" type="text" autocomplete="email" required aria-describedby="contact-hint">
-        <p class="hint" id="contact-hint">e.g. jane@example.com or M1234</p>
-        <p class="error" id="contact-error" hidden>Please enter your email or member number.</p>
+        <label for="contact">Slack username</label>
+        <input id="contact" name="contact" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required aria-describedby="contact-hint">
+        <p class="hint" id="contact-hint">e.g. @jane</p>
+        <p class="error" id="contact-error" hidden>Please enter your Slack username.</p>
       </div>
 
       <div class="field">
-        <label for="quantity">Number of bottles</label>
-        <input id="quantity" name="quantity" type="number" inputmode="numeric" min="1" max="12" step="1" value="1" required>
-        <p class="error" id="quantity-error" hidden>Please choose between 1 and 12 bottles.</p>
+        <label for="quantity">Bothy Bottling #3 bottles</label>
+        <input id="quantity" name="quantity" type="number" inputmode="numeric" min="0" max="12" step="1" value="1" required aria-describedby="quantity-hint">
+        <p class="hint" id="quantity-hint">Expression of interest, around £35 each</p>
+        <p class="error" id="quantity-error" hidden>Please choose between 0 and 12 bottles.</p>
       </div>
+
+      <div class="field">
+        <label for="magnum">Bothy Bottling #3 magnums</label>
+        <input id="magnum" name="magnum" type="number" inputmode="numeric" min="0" max="12" step="1" value="0" aria-describedby="magnum-hint">
+        <p class="hint" id="magnum-hint">Estimated £70 each, strictly collection only</p>
+        <p class="error" id="magnum-error" hidden>Please choose between 0 and 12 magnums.</p>
+      </div>
+
+      <fieldset class="extras">
+        <legend>Extra bottles <span class="optional">(optional)</span></legend>
+
+        <div class="field extra">
+          <label for="glen_elgin">Bothy Bottling #2 - Glen Elgin <span class="price">£50</span></label>
+          <input id="glen_elgin" name="glen_elgin" type="number" inputmode="numeric" min="0" max="12" step="1" value="0">
+          <p class="error" id="glen_elgin-error" hidden>Please choose between 0 and 12 bottles.</p>
+        </div>
+
+        <div class="field extra">
+          <label for="weller">Bothy Weller Full Proof (either pick) <span class="price">£50</span></label>
+          <input id="weller" name="weller" type="number" inputmode="numeric" min="0" max="12" step="1" value="0">
+          <p class="error" id="weller-error" hidden>Please choose between 0 and 12 bottles.</p>
+        </div>
+
+        <p class="error" id="total-error" hidden>Please choose at least one bottle.</p>
+      </fieldset>
 
       <div class="field">
         <label for="note">Note <span class="optional">(optional)</span></label>
@@ -52,8 +78,11 @@
       <h2>Thanks, <span id="confirm-name"></span>!</h2>
       <p>Your order has been received.</p>
       <dl class="summary">
-        <dt>Contact</dt><dd id="confirm-contact"></dd>
-        <dt>Bottles</dt><dd id="confirm-quantity"></dd>
+        <dt>Slack</dt><dd id="confirm-contact"></dd>
+        <dt>Bothy #3</dt><dd id="confirm-quantity"></dd>
+        <dt>Bothy #3 magnum</dt><dd id="confirm-magnum"></dd>
+        <dt>Glen Elgin</dt><dd id="confirm-glen_elgin"></dd>
+        <dt>Weller</dt><dd id="confirm-weller"></dd>
         <dt>Note</dt><dd id="confirm-note"></dd>
         <dt>Reference</dt><dd id="confirm-ref"></dd>
       </dl>
