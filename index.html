@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Club Whisky Order</title>
+  <meta name="description" content="Order the club whisky bottle.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <h1>Club Whisky</h1>
+      <p class="lead">Order your bottle of this year's club whisky. Fill in the form and we'll be in touch about payment and collection.</p>
+    </header>
+
+    <form id="order-form" data-sheet-orders novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required>
+        <p class="error" id="name-error" hidden>Please enter your name.</p>
+      </div>
+
+      <div class="field">
+        <label for="contact">Email or member number</label>
+        <input id="contact" name="contact" type="text" autocomplete="email" required aria-describedby="contact-hint">
+        <p class="hint" id="contact-hint">e.g. jane@example.com or M1234</p>
+        <p class="error" id="contact-error" hidden>Please enter your email or member number.</p>
+      </div>
+
+      <div class="field">
+        <label for="quantity">Number of bottles</label>
+        <input id="quantity" name="quantity" type="number" inputmode="numeric" min="1" max="12" step="1" value="1" required>
+        <p class="error" id="quantity-error" hidden>Please choose between 1 and 12 bottles.</p>
+      </div>
+
+      <div class="field">
+        <label for="note">Note <span class="optional">(optional)</span></label>
+        <textarea id="note" name="note" rows="3" maxlength="500"></textarea>
+      </div>
+
+      <input type="hidden" name="reference">
+
+      <!-- spam trap: hidden from people, bots fill it in and get ignored -->
+      <input name="website" tabindex="-1" autocomplete="off" class="trap" aria-hidden="true">
+
+      <button type="submit">Place order</button>
+      <p class="status" data-sheet-status role="status"></p>
+    </form>
+
+    <section id="confirmation" hidden tabindex="-1" aria-live="polite">
+      <h2>Thanks, <span id="confirm-name"></span>!</h2>
+      <p>Your order has been received.</p>
+      <dl class="summary">
+        <dt>Contact</dt><dd id="confirm-contact"></dd>
+        <dt>Bottles</dt><dd id="confirm-quantity"></dd>
+        <dt>Note</dt><dd id="confirm-note"></dd>
+        <dt>Reference</dt><dd id="confirm-ref"></dd>
+      </dl>
+      <button type="button" id="new-order" class="secondary">Place another order</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="js/sheet-config.js"></script>
+  <script src="js/sheet-orders.js" defer></script>
+</body>
+</html>
