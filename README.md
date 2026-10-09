@@ -1,6 +1,6 @@
 # Bookish Robot
 
-A simple website where club members register interest in the next Bothy Bottling and can order extra bottles of earlier ones. Members enter their name, email or member number, how many Bothy Bottling #3 bottles they want, any extra Glen Elgin (Bothy Bottling #2) or Full Proof Weller bottles, and an optional note, then see an on-screen confirmation with an order reference. The extra bottle counts arrive in the sheet as new `glen_elgin` and `weller` columns automatically.
+A simple website where club members register interest in the next Bothy Bottling and can order extra bottles of earlier ones. Members enter their name, Slack username, how many Bothy Bottling #3 bottles and magnums they want, any extra Glen Elgin (Bothy Bottling #2) or Full Proof Weller bottles, and an optional note, then see an on-screen confirmation with an order reference. The extra bottle counts arrive in the sheet as new `magnum`, `glen_elgin` and `weller` columns automatically.
 
 ## Run locally
 

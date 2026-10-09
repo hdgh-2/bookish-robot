@@ -13,7 +13,7 @@ function setInvalid(input, invalid) {
   error.hidden = !invalid;
 }
 
-const BOTTLE_FIELDS = ["quantity", "glen_elgin", "weller"];
+const BOTTLE_FIELDS = ["quantity", "magnum", "glen_elgin", "weller"];
 
 function validCount(input) {
   const n = Number(input.value);
@@ -55,6 +55,7 @@ function showConfirmation(order) {
   document.getElementById("confirm-name").textContent = order.name;
   document.getElementById("confirm-contact").textContent = order.contact;
   document.getElementById("confirm-quantity").textContent = order.quantity;
+  document.getElementById("confirm-magnum").textContent = order.magnum;
   document.getElementById("confirm-glen_elgin").textContent = order.glen_elgin;
   document.getElementById("confirm-weller").textContent = order.weller;
   document.getElementById("confirm-note").textContent = order.note || "None";
@@ -79,6 +80,7 @@ form.addEventListener("submit", (event) => {
     name: form.elements.name.value.trim(),
     contact: form.elements.contact.value.trim(),
     quantity: Number(form.elements.quantity.value),
+    magnum: Number(form.elements.magnum.value),
     glen_elgin: Number(form.elements.glen_elgin.value),
     weller: Number(form.elements.weller.value),
     note: form.elements.note.value.trim(),
