@@ -1,25 +1,17 @@
+/* Neon black with a Dom Pérignon label style blue. One dark theme for everyone. */
 :root {
-  --bg: #f6f1e9;
-  --card: #ffffff;
-  --text: #2b2118;
-  --muted: #6e6257;
-  --accent: #8a4b16;
-  --accent-hover: #6f3b10;
-  --border: #d9cfc3;
-  --error: #b42318;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1814;
-    --card: #27211b;
-    --text: #f3ece3;
-    --muted: #b3a597;
-    --accent: #d08a45;
-    --accent-hover: #e09b58;
-    --border: #4a3f35;
-    --error: #f97066;
-  }
+  color-scheme: dark;
+  --bg: #050608;
+  --card: #0d1015;
+  --field: #07090c;
+  --text: #eef6f9;
+  --muted: #a3b8c2;
+  --accent: #6fc3df;
+  --accent-hover: #9adcf0;
+  --accent-ink: #04161d;
+  --glow: rgba(111, 195, 223, .55);
+  --border: #3d6a7c;
+  --error: #ff7a85;
 }
 
 * { box-sizing: border-box; }
@@ -28,7 +20,7 @@ body {
   margin: 0;
   min-height: 100vh;
   padding: 2rem 1rem;
-  background: var(--bg);
+  background: radial-gradient(ellipse at top, #0c1a21 0%, var(--bg) 60%) fixed, var(--bg);
   color: var(--text);
   font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   display: flex;
@@ -40,12 +32,29 @@ body {
   width: 100%;
   max-width: 32rem;
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   border-radius: 12px;
   padding: 2rem 1.5rem;
+  box-shadow: 0 0 0 1px rgba(111, 195, 223, .15), 0 0 28px rgba(111, 195, 223, .25);
 }
 
-h1 { margin: 0 0 .5rem; font-size: 1.75rem; color: var(--accent); }
+h1 {
+  margin: 0 0 .75rem;
+  font-size: 1.9rem;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  color: var(--accent);
+  text-shadow: 0 0 6px var(--glow), 0 0 18px var(--glow);
+}
+.subtitle {
+  display: block;
+  margin-top: .35rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--text);
+  text-shadow: none;
+}
 h2 { margin: 0 0 .5rem; font-size: 1.4rem; }
 .lead { margin: 0 0 1.5rem; color: var(--muted); }
 
@@ -58,7 +67,7 @@ input, textarea {
   padding: .65rem .75rem;
   font: inherit;
   color: var(--text);
-  background: var(--card);
+  background: var(--field);
   border: 1px solid var(--border);
   border-radius: 8px;
 }
@@ -67,7 +76,17 @@ input:focus, textarea:focus, button:focus-visible {
   outline-offset: 1px;
 }
 input[aria-invalid="true"] { border-color: var(--error); }
-#quantity { max-width: 7rem; }
+input[type="number"] { max-width: 7rem; }
+
+.extras {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1rem .25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.extras legend { padding: 0 .4rem; font-weight: 600; color: var(--accent); }
+.extras #total-error { margin: -.5rem 0 1rem; }
+.price { font-weight: 400; color: var(--accent); white-space: nowrap; }
 textarea { resize: vertical; }
 
 .hint { margin: .3rem 0 0; font-size: .875rem; color: var(--muted); }
@@ -78,8 +97,9 @@ button {
   padding: .8rem 1rem;
   font: inherit;
   font-weight: 600;
-  color: #fff;
+  color: var(--accent-ink);
   background: var(--accent);
+  box-shadow: 0 0 14px var(--glow);
   border: 0;
   border-radius: 8px;
   cursor: pointer;
@@ -89,6 +109,7 @@ button:disabled { opacity: .6; cursor: wait; }
 button.secondary {
   color: var(--accent);
   background: transparent;
+  box-shadow: none;
   border: 1px solid var(--accent);
 }
 button.secondary:hover { background: transparent; color: var(--accent-hover); }
@@ -106,3 +127,4 @@ button.secondary:hover { background: transparent; color: var(--accent-hover); }
 .status { margin: .6rem 0 0; font-size: .875rem; color: var(--muted); }
 .status:empty { display: none; }
 .status[data-state="error"] { color: var(--error); }
+.nowrap { white-space: nowrap; }
