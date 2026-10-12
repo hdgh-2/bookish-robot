@@ -1,105 +1,95 @@
 /**
- * Google Apps Script web app that appends club whisky orders to a Google Sheet.
+ * Google Apps Script web app that serves the open pot ledger to the website.
  *
- * Paste this into Extensions > Apps Script on the orders spreadsheet and deploy
- * it as a web app. See docs/google-sheet-setup.md for the full steps.
+ * Paste this into Extensions > Apps Script on the spreadsheet and deploy it as
+ * a web app. See docs/google-sheet-setup.md for the full steps.
  *
- * Every field the order form posts becomes a column. The header row is created
- * on the first order, and a new column is added if the form gains a field.
+ * The "Pot" tab holds a Revolut Business statement export, pasted in as is.
+ * That export contains member names, references and account numbers, so this
+ * script never returns rows as they are: money in is added up per day with no
+ * names, and money out shows only a business payee (or your own public note).
  */
 
-var SHEET_NAME = 'Orders';
+var POT_SHEET_NAME = 'Pot';
 
-// Field names (form `name` attributes) that must be present for an order to be saved.
-// Leave empty to accept any submission.
-var REQUIRED_FIELDS = [];
+// Revolut export headings this script reads. Matching ignores case.
+var COLUMNS = {
+  id: 'ID',
+  date: 'Date completed (UTC)',
+  dateStarted: 'Date started (UTC)',
+  type: 'Type',
+  state: 'State',
+  description: 'Description',
+  totalAmount: 'Total amount',
+  amount: 'Amount',
+  beneficiary: 'Beneficiary name',
+  // Optional columns you can add yourself, anywhere in the header row.
+  category: 'Category',
+  note: 'Public note'
+};
 
-// Hidden "honeypot" field: real people leave it empty, spam bots fill it in.
-var HONEYPOT_FIELD = 'website';
+var MEMBER_PAYMENTS = 'Member payments';
+var NOTE_MAX = 140;
 
-function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+function doGet() {
   try {
-    var params = (e && e.parameter) || {};
-
-    if (params[HONEYPOT_FIELD]) {
-      return json_({ ok: true });
-    }
-
-    var missing = REQUIRED_FIELDS.filter(function (name) {
-      return !String(params[name] || '').trim();
-    });
-    if (missing.length) {
-      return json_({ ok: false, error: 'Missing fields: ' + missing.join(', ') });
-    }
-
-    var sheet = getSheet_();
-    var headers = getHeaders_(sheet);
-
-    Object.keys(params).forEach(function (key) {
-      if (key !== HONEYPOT_FIELD && headers.indexOf(key) === -1) {
-        headers.push(key);
-      }
-    });
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-
-    var row = headers.map(function (key) {
-      if (key === 'Timestamp') return new Date();
-      return sanitize_(params[key]);
-    });
-    sheet.appendRow(row);
-
-    return json_({ ok: true });
+    return json_(readPot_());
   } catch (err) {
     return json_({ ok: false, error: String(err) });
-  } finally {
-    lock.releaseLock();
   }
 }
 
-// Opening the web app URL in a browser checks it is deployed.
-// Adding ?view=pot returns the public open pot ledger (see readPot_).
-function doGet(e) {
-  var view = e && e.parameter && e.parameter.view;
-  if (view === 'pot') {
-    try {
-      return json_(readPot_());
-    } catch (err) {
-      return json_({ ok: false, error: String(err) });
-    }
-  }
-  return json_({ ok: true, message: 'Order endpoint is running.' });
-}
-
-// Tab holding the open pot ledger, kept by hand. Columns, in this order:
-//   Date | Type (In or Out) | Category | Description | Amount
-// Everything in these five columns is shown publicly on the pot page, so keep
-// names, account details and references out of them. Any extra columns to the
-// right are private and never leave the sheet.
-var POT_SHEET_NAME = 'Pot';
-var POT_DESCRIPTION_MAX = 140;
-
-// Returns only the public ledger columns and totals; never reads the Orders tab.
 function readPot_() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(POT_SHEET_NAME);
-  if (!sheet || sheet.getLastRow() < 2) {
-    return { ok: true, currency: 'GBP', totals: { in: 0, out: 0, balance: 0 }, categories: [], items: [] };
-  }
-
+  var rows = sheet ? sheet.getDataRange().getValues() : [];
   var tz = Session.getScriptTimeZone();
-  var rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getValues();
+  var get = columnReader_(rows.shift() || []);
+
+  var seen = {};
+  var moves = [];
+  rows.forEach(function (row) {
+    var id = get(row, 'id');
+    if (id && seen[id]) return; // the same export pasted twice
+    if (id) seen[id] = true;
+
+    var state = get(row, 'state').toUpperCase();
+    if (state && state !== 'COMPLETED') return;
+
+    var amount = Number(get(row, 'totalAmount') || get(row, 'amount'));
+    if (!isFinite(amount) || amount === 0) return;
+
+    moves.push({
+      date: formatDate_(get(row, 'date', true) || get(row, 'dateStarted', true), tz),
+      amount: amount,
+      type: get(row, 'type').toUpperCase(),
+      description: get(row, 'description'),
+      beneficiary: get(row, 'beneficiary'),
+      category: get(row, 'category'),
+      note: get(row, 'note').slice(0, NOTE_MAX)
+    });
+  });
+
   var items = [];
-  rows.forEach(function (r) {
-    var type = String(r[1]).trim().toLowerCase();
-    var amount = Math.abs(Number(r[4]));
-    if ((type !== 'in' && type !== 'out') || !isFinite(amount) || amount === 0) return;
+  var paymentsByDate = {};
+  var memberPayments = 0;
+  moves.forEach(function (m) {
+    if (m.amount > 0 && !m.note) {
+      var day = paymentsByDate[m.date];
+      if (!day) {
+        day = paymentsByDate[m.date] = { date: m.date, type: 'in', category: m.category || MEMBER_PAYMENTS, count: 0, amount: 0 };
+        items.push(day);
+      }
+      day.count += 1;
+      day.amount += m.amount;
+      memberPayments += 1;
+      return;
+    }
     items.push({
-      date: r[0] instanceof Date ? Utilities.formatDate(r[0], tz, 'yyyy-MM-dd') : String(r[0]).trim(),
-      type: type,
-      category: String(r[2]).trim() || 'Other',
-      description: String(r[3]).trim().slice(0, POT_DESCRIPTION_MAX),
-      amount: round2_(amount)
+      date: m.date,
+      type: m.amount > 0 ? 'in' : 'out',
+      category: m.category || defaultCategory_(m),
+      description: m.note || (m.amount < 0 ? payee_(m) : ''),
+      amount: Math.abs(m.amount)
     });
   });
 
@@ -107,6 +97,11 @@ function readPot_() {
   var totalOut = 0;
   var byCategory = {};
   items.forEach(function (item) {
+    item.amount = round2_(item.amount);
+    if (item.count) {
+      item.description = item.count + (item.count === 1 ? ' payment' : ' payments');
+      delete item.count;
+    }
     if (item.type === 'in') {
       totalIn += item.amount;
     } else {
@@ -122,39 +117,64 @@ function readPot_() {
   return {
     ok: true,
     currency: 'GBP',
-    totals: { in: round2_(totalIn), out: round2_(totalOut), balance: round2_(totalIn - totalOut) },
+    totals: {
+      in: round2_(totalIn),
+      out: round2_(totalOut),
+      balance: round2_(totalIn - totalOut),
+      memberPayments: memberPayments
+    },
     categories: categories,
     items: items
   };
 }
 
+// Returns get(row, key[, raw]) for the COLUMNS above; missing columns read as ''.
+function columnReader_(headerRow) {
+  var headers = headerRow.map(function (h) { return String(h).trim().toLowerCase(); });
+  var index = {};
+  Object.keys(COLUMNS).forEach(function (key) {
+    index[key] = headers.indexOf(COLUMNS[key].toLowerCase());
+  });
+  return function (row, key, raw) {
+    var i = index[key];
+    if (i === -1 || row[i] == null) return '';
+    return raw ? row[i] : String(row[i]).trim();
+  };
+}
+
+function defaultCategory_(m) {
+  if (m.amount > 0) return 'Other money in';
+  if (m.type === 'FEE') return 'Fees';
+  if (m.type === 'CARD_PAYMENT') return 'Card payments';
+  return 'Payments';
+}
+
+// Who was paid. Only names that are clearly businesses (card merchants, or a
+// company name) are shown; a payment to a person reads "Payment" or "Refund"
+// unless you give it a Public note.
+var BUSINESS_NAME = /\b(ltd|limited|plc|llp|inc|llc|gmbh|co)\b\.?/i;
+
+function payee_(m) {
+  var name = m.beneficiary || m.description.replace(/^to\s+/i, '');
+  if (m.type === 'REFUND') return 'Refund';
+  if (name && (m.type === 'CARD_PAYMENT' || BUSINESS_NAME.test(name))) return titleCase_(name);
+  return 'Payment';
+}
+
+// Revolut gives names in capitals; "CASK EXIT PARTNERS LIMITED" reads better as
+// "Cask Exit Partners Limited". Mixed-case names are left alone.
+function titleCase_(name) {
+  if (name !== name.toUpperCase()) return name;
+  return name.toLowerCase().replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); });
+}
+
+function formatDate_(value, tz) {
+  if (value instanceof Date) return Utilities.formatDate(value, tz, 'yyyy-MM-dd');
+  return String(value).trim().slice(0, 10);
+}
+
 function round2_(n) {
   return Math.round(n * 100) / 100;
-}
-
-function getSheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Timestamp']);
-    sheet.setFrozenRows(1);
-  }
-  return sheet;
-}
-
-function getHeaders_(sheet) {
-  var lastCol = Math.max(sheet.getLastColumn(), 1);
-  return sheet
-    .getRange(1, 1, 1, lastCol)
-    .getValues()[0]
-    .filter(function (h) { return h !== ''; })
-    .map(String);
-}
-
-// Stop values like "=HYPERLINK(...)" being run as spreadsheet formulas.
-function sanitize_(value) {
-  var s = value == null ? '' : String(value);
-  return /^[=+\-@]/.test(s) ? "'" + s : s;
 }
 
 function json_(obj) {
