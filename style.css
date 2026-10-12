@@ -128,3 +128,51 @@ button.secondary:hover { background: transparent; color: var(--accent-hover); }
 .status:empty { display: none; }
 .status[data-state="error"] { color: var(--error); }
 .nowrap { white-space: nowrap; }
+
+/* Open pot page */
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+.back { margin: 1.5rem 0 0; font-size: .875rem; }
+.pot-link { margin: 1.25rem 0 0; font-size: .875rem; text-align: center; }
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .6rem;
+  margin: 0 0 1.75rem;
+}
+.tile {
+  padding: .75rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--field);
+}
+.tile dt { font-size: .8rem; color: var(--muted); }
+.tile dd { margin: .2rem 0 0; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile.balance { border-color: var(--accent); }
+.tile.balance dd { color: var(--accent); text-shadow: 0 0 8px var(--glow); }
+@media (max-width: 26rem) {
+  .tiles { grid-template-columns: 1fr 1fr; }
+  .tile.balance { grid-column: 1 / -1; }
+}
+
+.pot-section { margin-bottom: 1.75rem; }
+.pot-section h2 { font-size: 1.1rem; color: var(--accent); }
+
+.bars { list-style: none; margin: 0; padding: 0; }
+.bar-row { margin-bottom: .7rem; }
+.bar-label { display: flex; justify-content: space-between; gap: 1rem; font-size: .9rem; margin-bottom: .25rem; }
+.bar-value { font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar-track { height: 8px; }
+.bar-fill { height: 100%; min-width: 4px; border-radius: 0 4px 4px 0; background: var(--accent); }
+
+.table-wrap { overflow-x: auto; }
+.ledger { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.ledger th { text-align: left; font-weight: 600; color: var(--muted); padding: 0 .5rem .4rem 0; border-bottom: 1px solid var(--border); }
+.ledger td { padding: .55rem .5rem .55rem 0; border-bottom: 1px solid rgba(61, 106, 124, .4); vertical-align: top; }
+.ledger .num { text-align: right; padding-right: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ledger .date { white-space: nowrap; color: var(--muted); }
+.ledger .category { display: block; font-weight: 600; }
+.ledger .description { display: block; color: var(--muted); }
+.ledger .muted { color: var(--muted); }
+.amount-in { color: var(--accent); }

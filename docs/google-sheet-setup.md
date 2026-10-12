@@ -98,10 +98,58 @@ After editing the script, publish the change without changing the URL:
 Creating a *new* deployment instead gives a new URL, which you would then need
 to paste into `js/sheet-config.js` again.
 
+## Open pot tracker
+
+[`pot.html`](../pot.html) shows members how the pooled funds have been used:
+money paid in, money spent, what is left, spending by category and every line
+in the ledger. It reads a hand-kept **Pot** tab in the same spreadsheet through
+the same web app URL, so there is nothing new to configure on the website.
+
+### Set up the Pot tab
+
+1. Add a tab named exactly **Pot** to the orders spreadsheet.
+2. Put these headings in row 1, columns A to E:
+
+   | Date | Type | Category | Description | Amount |
+   |------|------|----------|-------------|--------|
+   | 06/10/2026 | In | Contributions | Bottle payments, week of 6 Oct | 1260 |
+   | 08/10/2026 | Out | Cask | Bothy #3 cask share | 950 |
+   | 10/10/2026 | Out | Bottling | Bottles, corks and labels | 145.50 |
+
+   - **Type** is `In` or `Out`. Rows with anything else, or with no amount, are
+     skipped, so you can leave notes or blank rows.
+   - **Amount** is a positive number in pounds; Type decides the sign.
+   - **Category** groups the spending chart. Keep a short, consistent list
+     (for example Cask, Bottling, Duty, Shipping, Fees, Refunds).
+3. If you already deployed the script, publish the updated version (see
+   [Changing the script later](#changing-the-script-later)) so it can read the
+   Pot tab. The URL stays the same.
+
+To check it, open the web app URL with `?view=pot` on the end. You should see
+the totals and your rows as JSON.
+
+### Keeping it current
+
+Add a line whenever money moves. A Revolut Business statement downloaded as
+CSV is a handy monthly check that the ledger's "Left in the pot" matches the
+account.
+
+### What is public
+
+Columns A to E of the Pot tab are shown to anyone who opens the page, so:
+
+- record money coming in as weekly or batch totals ("Bottle payments, week of
+  6 Oct"), not one line per member;
+- never put names, Slack handles, account numbers, sort codes or payment
+  references in Description;
+- anything private can go in column F onwards. The script only ever reads
+  columns A to E of the Pot tab, and never returns anything from the Orders tab.
+
 ## Good to know
 
 - **Privacy:** the sheet is private to you unless you share it. The web app URL
-  only lets people *add* rows; it cannot read the sheet.
+  only lets people *add* order rows; the only thing it returns is columns A to E
+  of the Pot tab (see [What is public](#what-is-public)).
 - **Spam:** the hidden `website` field filters simple bots. If junk orders
   become a problem, set `REQUIRED_FIELDS` or add a club password field and check
   it in the script.

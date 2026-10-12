@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Pot</title>
+  <meta name="description" content="How the pooled Bothy Bottling funds have been used.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <h1>Open pot <span class="subtitle">Where the Bothy money went</span></h1>
+      <p class="lead">Every pound paid in and every pound spent, so everyone can see how the pooled funds have been used.</p>
+    </header>
+
+    <p class="status" id="pot-status" role="status">Loading the pot…</p>
+
+    <div id="pot" hidden>
+      <dl class="tiles">
+        <div class="tile"><dt>Paid in</dt><dd id="pot-in"></dd></div>
+        <div class="tile"><dt>Spent</dt><dd id="pot-out"></dd></div>
+        <div class="tile balance"><dt>Left in the pot</dt><dd id="pot-balance"></dd></div>
+      </dl>
+
+      <section id="pot-categories-section" class="pot-section" hidden>
+        <h2>Spent by category</h2>
+        <ul class="bars" id="pot-categories"></ul>
+      </section>
+
+      <section class="pot-section">
+        <h2>Every payment</h2>
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr><th scope="col">Date</th><th scope="col">What</th><th scope="col" class="num">Amount</th></tr>
+            </thead>
+            <tbody id="pot-items"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <p class="back"><a href="./">Back to the order page</a></p>
+  </main>
+
+  <script src="js/sheet-config.js"></script>
+  <script src="js/pot.js" defer></script>
+</body>
+</html>
