@@ -95,6 +95,26 @@ h2 { margin: 0 0 .5rem; font-size: 1.4rem; }
 .bar-track { height: 8px; }
 .bar-fill { height: 100%; min-width: 4px; border-radius: 0 4px 4px 0; background: var(--accent); }
 
+.payer-group { margin-bottom: 1rem; }
+.payer-group h3 { margin: 0 0 .4rem; font-size: .95rem; }
+.payer-rule { font-weight: 400; font-size: .8rem; color: var(--muted); margin-left: .35rem; }
+.payers { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+.payer {
+  display: inline-flex;
+  gap: .4rem;
+  align-items: baseline;
+  padding: .25rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--field);
+  font-size: .875rem;
+}
+.payer-amount { color: var(--accent); font-variant-numeric: tabular-nums; font-size: .8rem; }
+.payers.unpaid .payer { border-style: dashed; color: var(--muted); }
+.payers .muted { color: var(--muted); font-size: .875rem; }
+.payer-note { margin: 0; font-size: .8rem; color: var(--muted); }
+.payer-note:empty { display: none; }
+
 .table-wrap { overflow-x: auto; }
 .ledger { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .ledger th { text-align: left; font-weight: 600; color: var(--muted); padding: 0 .5rem .4rem 0; border-bottom: 1px solid var(--border); }
