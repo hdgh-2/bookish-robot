@@ -41,6 +41,49 @@
     document.getElementById('pot-categories-section').hidden = categories.length === 0;
   }
 
+  function fillPayers(id, people, showAmount) {
+    var list = document.getElementById(id);
+    list.replaceChildren();
+    if (!people.length) {
+      list.append(el('li', 'muted', 'Nobody yet.'));
+      return;
+    }
+    people.forEach(function (p) {
+      var item = el('li', 'payer');
+      item.append(el('span', 'payer-name', p.name));
+      if (showAmount) item.append(el('span', 'payer-amount', money.format(p.amount)));
+      list.append(item);
+    });
+  }
+
+  function renderPayers(payers) {
+    var section = document.getElementById('payers-section');
+    if (!payers) {
+      section.hidden = true;
+      return;
+    }
+    var from = money.format(payers.magnumFrom);
+    document.getElementById('payers-magnum-rule').textContent = from + ' or more';
+    document.getElementById('payers-bottle-rule').textContent = 'under ' + from;
+    fillPayers('payers-magnum', payers.magnum, true);
+    fillPayers('payers-bottle', payers.bottle, true);
+
+    var unpaidGroup = document.getElementById('payers-unpaid-group');
+    unpaidGroup.hidden = !payers.notPaid;
+    if (payers.notPaid) fillPayers('payers-unpaid', payers.notPaid, false);
+
+    var notes = [];
+    if (payers.unlabelled) {
+      notes.push(payers.unlabelled + (payers.unlabelled === 1 ? ' payment has' : ' payments have') +
+        ' no Slack name yet, so ' + (payers.unlabelled === 1 ? 'it is' : 'they are') + ' not listed.');
+    }
+    if (payers.notPaid && payers.notPaid.length) {
+      notes.push('Paid but still listed as not paid? Your payment reference may not match the Slack name on your order; let the organiser know.');
+    }
+    document.getElementById('payers-note').textContent = notes.join(' ');
+    section.hidden = false;
+  }
+
   function renderItems(items) {
     var body = document.getElementById('pot-items');
     body.replaceChildren();
@@ -76,6 +119,7 @@
       count ? 'from ' + count + (count === 1 ? ' payment' : ' payments') : '';
     document.getElementById('pot-out').textContent = money.format(data.totals.out);
     document.getElementById('pot-balance').textContent = money.format(data.totals.balance);
+    renderPayers(data.payers);
     renderCategories(data.categories || []);
     renderItems(data.items || []);
     statusEl.textContent = '';

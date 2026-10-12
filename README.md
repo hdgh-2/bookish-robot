@@ -1,6 +1,6 @@
 # Bookish Robot
 
-An open pot tracker for the club's Bothy Bottling funds. The page shows how much members have paid in, how much has been spent, what is left in the pot, spending by category and each payment, without showing anyone's name or bank details.
+An open pot tracker for the club's Bothy Bottling funds. The page shows how much members have paid in, how much has been spent, what is left in the pot, spending by category, each payment and who has paid (by Slack name), without showing anyone's real name or bank details.
 
 The figures come from a Revolut Business statement pasted into a private Google Sheet, summarised by an Apps Script web app; see [docs/google-sheet-setup.md](docs/google-sheet-setup.md).
 

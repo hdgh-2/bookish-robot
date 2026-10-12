@@ -2,7 +2,7 @@
 
 The website shows how the pooled funds in the Revolut Business account have
 been used: money paid in, money spent, what is left, spending by category and
-each payment. It reads a **Pot** tab in a Google Sheet that you keep private,
+each payment, plus who has paid. It reads a **Pot** tab in a Google Sheet that you keep private,
 through a small Google Apps Script "web app" attached to the sheet. No server or
 paid service is needed.
 
@@ -16,6 +16,24 @@ paid service is needed.
    ignored.
 
 The page updates as soon as the sheet does; there is nothing to publish.
+
+### Who has paid
+
+The page lists who has paid by the **Slack ref** column in the Pot tab, which
+you fill in by hand next to each payment with the payer's Slack name. Payments
+from the same Slack name are added up: **£70 or more** is listed under
+**Magnum**, anything less under **70cl**. Payments with no Slack ref are left
+out of the list (the page says how many).
+
+Anyone whose Slack name is on the **Orders** tab (the `contact` column) with no
+matching payment is listed under **Ordered, not paid yet**. Names match when
+they are the same ignoring capitals, spaces, `@` and punctuation, or when one
+starts with the other ("Tom" and "Tom M"). When a name on an order doesn't
+match the Slack ref on that person's payment, for example "bondadam" and
+"Adam", add a **Slack ref** column to the Orders tab and type the payment's
+Slack ref on that order's row.
+
+To change the magnum amount, edit `MAGNUM_FROM` at the top of `Code.gs`.
 
 ### Labelling spending (optional)
 
@@ -46,8 +64,10 @@ numbers. None of it is sent to the page:
   the payee, but only when the payee is clearly a business (a card merchant, or
   a name ending in Ltd, Limited, PLC, LLP and so on). Anything else reads
   "Payment" or "Refund".
-- The script only ever reads the Pot tab. Other tabs, such as Orders, are never
-  returned.
+- **Who has paid** shows the Slack ref and total paid for each person, and the
+  Slack names from Orders that have no payment yet. Nothing else from the
+  Orders tab is returned.
+- The script reads only the Pot and Orders tabs. Other tabs are never read.
 
 Don't use the sheet's **File > Share > Publish to web**; the web app is the
 only thing the page needs.

@@ -23,6 +23,23 @@
         <div class="tile balance"><dt>Left in the pot</dt><dd id="pot-balance"></dd></div>
       </dl>
 
+      <section id="payers-section" class="pot-section" hidden>
+        <h2>Who has paid</h2>
+        <div class="payer-group">
+          <h3>Magnum <span class="payer-rule" id="payers-magnum-rule"></span></h3>
+          <ul class="payers" id="payers-magnum"></ul>
+        </div>
+        <div class="payer-group">
+          <h3>70cl <span class="payer-rule" id="payers-bottle-rule"></span></h3>
+          <ul class="payers" id="payers-bottle"></ul>
+        </div>
+        <div class="payer-group" id="payers-unpaid-group" hidden>
+          <h3>Ordered, not paid yet</h3>
+          <ul class="payers unpaid" id="payers-unpaid"></ul>
+        </div>
+        <p class="payer-note" id="payers-note"></p>
+      </section>
+
       <section id="pot-categories-section" class="pot-section" hidden>
         <h2>Spent by category</h2>
         <ul class="bars" id="pot-categories"></ul>
