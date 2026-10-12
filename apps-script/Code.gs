@@ -253,8 +253,17 @@ function columnReader_(headerRow, columns) {
   };
 }
 
+// Payees that get their own category, matched on the start of the payee name.
+var PAYEE_CATEGORIES = [
+  { match: /^cask exit partners\b/i, category: 'Cask purchase' }
+];
+
 function defaultCategory_(m) {
   if (m.amount > 0) return 'Other money in';
+  var name = m.beneficiary || m.description.replace(/^to\s+/i, '');
+  for (var i = 0; i < PAYEE_CATEGORIES.length; i++) {
+    if (PAYEE_CATEGORIES[i].match.test(name)) return PAYEE_CATEGORIES[i].category;
+  }
   if (m.type === 'FEE') return 'Fees';
   if (m.type === 'CARD_PAYMENT') return 'Card payments';
   return 'Payments';
