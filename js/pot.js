@@ -1,8 +1,8 @@
 /**
- * Shows the open pot ledger on pot.html.
+ * Shows the open pot ledger on the home page.
  *
- * Reads the public "Pot" tab through the same Apps Script web app that takes
- * orders (ORDER_SHEET_URL + ?view=pot). See docs/google-sheet-setup.md.
+ * Reads the anonymised summary of the "Pot" tab from the Apps Script web app at
+ * POT_SHEET_URL. See docs/google-sheet-setup.md.
  */
 (function () {
   var statusEl = document.getElementById('pot-status');
@@ -71,6 +71,9 @@
 
   function render(data) {
     document.getElementById('pot-in').textContent = money.format(data.totals.in);
+    var count = data.totals.memberPayments;
+    document.getElementById('pot-in-count').textContent =
+      count ? 'from ' + count + (count === 1 ? ' payment' : ' payments') : '';
     document.getElementById('pot-out').textContent = money.format(data.totals.out);
     document.getElementById('pot-balance').textContent = money.format(data.totals.balance);
     renderCategories(data.categories || []);
@@ -84,13 +87,13 @@
     statusEl.setAttribute('data-state', 'error');
   }
 
-  var url = window.ORDER_SHEET_URL;
+  var url = window.POT_SHEET_URL;
   if (!url) {
     fail('The pot is not connected to the sheet yet.');
     return;
   }
 
-  fetch(url + (url.indexOf('?') === -1 ? '?' : '&') + 'view=pot')
+  fetch(url)
     .then(function (res) { return res.json(); })
     .then(function (data) {
       if (!data.ok || !data.totals) throw new Error(data.error || 'No pot data');

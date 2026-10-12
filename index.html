@@ -3,97 +3,46 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bothy Bottling #3 Order</title>
-  <meta name="description" content="Register interest in Bothy Bottling #3 and order extra Bothy bottles.">
+  <title>Bothy Open Pot</title>
+  <meta name="description" content="How the pooled Bothy Bottling funds have been used.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="card">
     <header>
-      <h1>Dom Bothignan <span class="subtitle">Inchdairnie 2019 Sherry Bomb <span class="nowrap">@ 65% ABV</span></span></h1>
-      <p class="lead">This is an expression of interest in the next Bothy Bottling #3 - the cask is very small and we may not have enough to go around. We expect standard size bottles to cost around £35 and larger format bottles may be available.</p>
+      <h1>Open pot <span class="subtitle">Where the Bothy money went</span></h1>
+      <p class="lead">Every pound paid in and every pound spent, so everyone can see how the pooled funds have been used.</p>
     </header>
 
-    <form id="order-form" data-sheet-orders novalidate>
-      <div class="field">
-        <label for="name">Name</label>
-        <input id="name" name="name" type="text" autocomplete="name" required>
-        <p class="error" id="name-error" hidden>Please enter your name.</p>
-      </div>
+    <p class="status" id="pot-status" role="status">Loading the pot…</p>
 
-      <div class="field">
-        <label for="contact">Slack username</label>
-        <input id="contact" name="contact" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" required aria-describedby="contact-hint">
-        <p class="hint" id="contact-hint">e.g. @jane</p>
-        <p class="error" id="contact-error" hidden>Please enter your Slack username.</p>
-      </div>
-
-      <div class="field">
-        <label for="quantity">Bothy Bottling #3 bottles</label>
-        <input id="quantity" name="quantity" type="number" inputmode="numeric" min="0" max="12" step="1" value="1" required aria-describedby="quantity-hint">
-        <p class="hint" id="quantity-hint">Expression of interest, around £35 each</p>
-        <p class="error" id="quantity-error" hidden>Please choose between 0 and 12 bottles.</p>
-      </div>
-
-      <div class="field">
-        <label for="magnum">Bothy Bottling #3 magnums</label>
-        <input id="magnum" name="magnum" type="number" inputmode="numeric" min="0" max="12" step="1" value="0" aria-describedby="magnum-hint">
-        <p class="hint" id="magnum-hint">Estimated £70 each</p>
-        <p class="error" id="magnum-error" hidden>Please choose between 0 and 12 magnums.</p>
-      </div>
-
-      <fieldset class="extras">
-        <legend>Extra bottles <span class="optional">(optional)</span></legend>
-
-        <div class="field extra">
-          <label for="glen_elgin">Bothy Bottling #2 - Glen Elgin <span class="price">£50</span></label>
-          <input id="glen_elgin" name="glen_elgin" type="number" inputmode="numeric" min="0" max="12" step="1" value="0">
-          <p class="error" id="glen_elgin-error" hidden>Please choose between 0 and 12 bottles.</p>
-        </div>
-
-        <div class="field extra">
-          <label for="weller">Bothy Weller Full Proof (either pick) <span class="price">£50</span></label>
-          <input id="weller" name="weller" type="number" inputmode="numeric" min="0" max="12" step="1" value="0">
-          <p class="error" id="weller-error" hidden>Please choose between 0 and 12 bottles.</p>
-        </div>
-
-        <p class="error" id="total-error" hidden>Please choose at least one bottle.</p>
-      </fieldset>
-
-      <div class="field">
-        <label for="note">Note <span class="optional">(optional)</span></label>
-        <textarea id="note" name="note" rows="3" maxlength="500"></textarea>
-      </div>
-
-      <input type="hidden" name="reference">
-
-      <!-- spam trap: hidden from people, bots fill it in and get ignored -->
-      <input name="website" tabindex="-1" autocomplete="off" class="trap" aria-hidden="true">
-
-      <button type="submit">Place order</button>
-      <p class="status" data-sheet-status role="status"></p>
-    </form>
-
-    <section id="confirmation" hidden tabindex="-1" aria-live="polite">
-      <h2>Thanks, <span id="confirm-name"></span>!</h2>
-      <p>Your order has been received.</p>
-      <dl class="summary">
-        <dt>Slack</dt><dd id="confirm-contact"></dd>
-        <dt>Bothy #3</dt><dd id="confirm-quantity"></dd>
-        <dt>Bothy #3 magnum</dt><dd id="confirm-magnum"></dd>
-        <dt>Glen Elgin</dt><dd id="confirm-glen_elgin"></dd>
-        <dt>Weller</dt><dd id="confirm-weller"></dd>
-        <dt>Note</dt><dd id="confirm-note"></dd>
-        <dt>Reference</dt><dd id="confirm-ref"></dd>
+    <div id="pot" hidden>
+      <dl class="tiles">
+        <div class="tile"><dt>Paid in</dt><dd id="pot-in"></dd><dd class="tile-note" id="pot-in-count"></dd></div>
+        <div class="tile"><dt>Spent</dt><dd id="pot-out"></dd></div>
+        <div class="tile balance"><dt>Left in the pot</dt><dd id="pot-balance"></dd></div>
       </dl>
-      <button type="button" id="new-order" class="secondary">Place another order</button>
-    </section>
 
-    <p class="pot-link"><a href="pot.html">See where the pot money went</a></p>
+      <section id="pot-categories-section" class="pot-section" hidden>
+        <h2>Spent by category</h2>
+        <ul class="bars" id="pot-categories"></ul>
+      </section>
+
+      <section class="pot-section">
+        <h2>Every payment</h2>
+        <div class="table-wrap">
+          <table class="ledger">
+            <thead>
+              <tr><th scope="col">Date</th><th scope="col">What</th><th scope="col" class="num">Amount</th></tr>
+            </thead>
+            <tbody id="pot-items"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <script src="script.js"></script>
   <script src="js/sheet-config.js"></script>
-  <script src="js/sheet-orders.js" defer></script>
+  <script src="js/pot.js" defer></script>
 </body>
 </html>
