@@ -33,6 +33,9 @@ match the Slack ref on that person's payment, for example "bondadam" and
 "Adam", add a **Slack ref** column to the Orders tab and type the payment's
 Slack ref on that order's row.
 
+To leave someone off the not-paid list while you check their payment by hand,
+add their Slack name to `CHECKING_BY_HAND` at the top of `Code.gs`.
+
 To change the magnum amount, edit `MAGNUM_FROM` at the top of `Code.gs`.
 
 ### Labelling spending (optional)

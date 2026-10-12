@@ -19,6 +19,17 @@ var ORDERS_SHEET_NAME = 'Orders';
 // Paid this much or more counts as a magnum; less counts as a 70cl bottle.
 var MAGNUM_FROM = 70;
 
+// Slack names on Orders that are left off "not paid yet" while you check them
+// by hand. Matching ignores capitals, spaces and punctuation.
+var CHECKING_BY_HAND = [
+  'BlacklistedBusta',
+  'bondadam',
+  'dimabag',
+  'Maciej',
+  'Marko',
+  'FarcThat (Oli)'
+];
+
 // Revolut export headings this script reads. Matching ignores case.
 var COLUMNS = {
   id: 'ID',
@@ -177,6 +188,7 @@ function payers_(moves, orderContacts) {
   if (orderContacts) {
     notPaid = [];
     var listed = {};
+    CHECKING_BY_HAND.forEach(function (name) { listed[slackKey_(name)] = true; });
     orderContacts.forEach(function (name) {
       var key = slackKey_(name);
       if (!key || listed[key] || matchPayer_(key, paidList)) return;
