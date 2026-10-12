@@ -14,6 +14,10 @@ python3 -m http.server 8000
 
 Orders are saved to a Google Sheet through an Apps Script web app; see [docs/google-sheet-setup.md](docs/google-sheet-setup.md). Until `window.ORDER_SHEET_URL` is set in `js/sheet-config.js`, the page only shows the confirmation and orders are not sent anywhere.
 
+## Open pot tracker
+
+`pot.html` shows how the pooled funds have been used: totals in and out, what is left, spending by category and each ledger line. It reads a hand-kept **Pot** tab in the orders spreadsheet through the same Apps Script web app; see [Open pot tracker](docs/google-sheet-setup.md#open-pot-tracker) for the tab layout and what is public.
+
 ## Hosting on GitHub Pages
 
 In the repository's **Settings → Pages**, choose **Deploy from a branch**, pick `main` and `/ (root)`, and save. The site appears at `https://<user>.github.io/bookish-robot/`.

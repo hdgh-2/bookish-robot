@@ -58,9 +58,78 @@ function doPost(e) {
   }
 }
 
-// Lets you open the web app URL in a browser to check it is deployed.
-function doGet() {
+// Opening the web app URL in a browser checks it is deployed.
+// Adding ?view=pot returns the public open pot ledger (see readPot_).
+function doGet(e) {
+  var view = e && e.parameter && e.parameter.view;
+  if (view === 'pot') {
+    try {
+      return json_(readPot_());
+    } catch (err) {
+      return json_({ ok: false, error: String(err) });
+    }
+  }
   return json_({ ok: true, message: 'Order endpoint is running.' });
+}
+
+// Tab holding the open pot ledger, kept by hand. Columns, in this order:
+//   Date | Type (In or Out) | Category | Description | Amount
+// Everything in these five columns is shown publicly on the pot page, so keep
+// names, account details and references out of them. Any extra columns to the
+// right are private and never leave the sheet.
+var POT_SHEET_NAME = 'Pot';
+var POT_DESCRIPTION_MAX = 140;
+
+// Returns only the public ledger columns and totals; never reads the Orders tab.
+function readPot_() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(POT_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) {
+    return { ok: true, currency: 'GBP', totals: { in: 0, out: 0, balance: 0 }, categories: [], items: [] };
+  }
+
+  var tz = Session.getScriptTimeZone();
+  var rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getValues();
+  var items = [];
+  rows.forEach(function (r) {
+    var type = String(r[1]).trim().toLowerCase();
+    var amount = Math.abs(Number(r[4]));
+    if ((type !== 'in' && type !== 'out') || !isFinite(amount) || amount === 0) return;
+    items.push({
+      date: r[0] instanceof Date ? Utilities.formatDate(r[0], tz, 'yyyy-MM-dd') : String(r[0]).trim(),
+      type: type,
+      category: String(r[2]).trim() || 'Other',
+      description: String(r[3]).trim().slice(0, POT_DESCRIPTION_MAX),
+      amount: round2_(amount)
+    });
+  });
+
+  var totalIn = 0;
+  var totalOut = 0;
+  var byCategory = {};
+  items.forEach(function (item) {
+    if (item.type === 'in') {
+      totalIn += item.amount;
+    } else {
+      totalOut += item.amount;
+      byCategory[item.category] = (byCategory[item.category] || 0) + item.amount;
+    }
+  });
+
+  var categories = Object.keys(byCategory)
+    .map(function (name) { return { name: name, amount: round2_(byCategory[name]) }; })
+    .sort(function (a, b) { return b.amount - a.amount; });
+
+  return {
+    ok: true,
+    currency: 'GBP',
+    totals: { in: round2_(totalIn), out: round2_(totalOut), balance: round2_(totalIn - totalOut) },
+    categories: categories,
+    items: items
+  };
+}
+
+function round2_(n) {
+  return Math.round(n * 100) / 100;
 }
 
 function getSheet_() {
